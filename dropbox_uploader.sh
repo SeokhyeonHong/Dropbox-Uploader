@@ -1233,53 +1233,53 @@ function db_list
 #$1 = Remote directory
 function db_list_file
 {
-	local DIR_DST=$(normalize_path "$1")
+    local DIR_DST=$(normalize_path "$1")
 
-	print " > Listing files \"$DIR_DST\"... "
+    print " > Listing files \"$DIR_DST\"... "
 
-	if [[ "$DIR_DST" == "/" ]]; then
-		DIR_DST=""
-	fi
+    if [[ "$DIR_DST" == "/" ]]; then
+        DIR_DST=""
+    fi
 
-	OUT_FILE=$(db_list_outfile "$DIR_DST")
-	if [ -z "$OUT_FILE" ]; then
-		print "FAILED\n"
-		ERROR_STATUS=1
-		return
-	else
-		print "DONE\n"
-	fi
+    OUT_FILE=$(db_list_outfile "$DIR_DST")
+    if [ -z "$OUT_FILE" ]; then
+        print "FAILED\n"
+        ERROR_STATUS=1
+        return
+    else
+        print "DONE\n"
+    fi
 
-	#Looking for the biggest file size
-	#to calculate the padding to use
-	local padding=0
-	while read -r line; do
-		local FILE=${line%:*}
-		local META=${line##*:}
-		local SIZE=${META#*;}
-		if [[ ${#SIZE} -gt $padding ]]; then
-			padding=${#SIZE}
-		fi
-	done < "$OUT_FILE"
+    #Looking for the biggest file size
+    #to calculate the padding to use
+    local padding=0
+    while read -r line; do
+        local FILE=${line%:*}
+        local META=${line##*:}
+        local SIZE=${META#*;}
+        if [[ ${#SIZE} -gt $padding ]]; then
+            padding=${#SIZE}
+        fi
+    done < "$OUT_FILE"
 
-	#For each entry, printing files
-	while read -r line; do
-		local FILE=${line%:*}
-		local META=${line##*:}
-		local TYPE=${META%;*}
-		local SIZE=${META#*;}
+    #For each entry, printing files
+    while read -r line; do
+        local FILE=${line%:*}
+        local META=${line##*:}
+        local TYPE=${META%;*}
+        local SIZE=${META#*;}
 
-		#Removing unneeded
-		FILE=${FILE##*/}
+        #Removing unneeded
+        FILE=${FILE##*/}
 
-		if [[ $TYPE == "file" ]]; then
-			FILE=$(echo -e "$FILE")
-			$PRINTF " [F] %-${padding}s %s\n" "$SIZE" "$FILE"
-		fi
+        if [[ $TYPE == "file" ]]; then
+            FILE=$(echo -e "$FILE")
+            $PRINTF " [F] %-${padding}s %s\n" "$SIZE" "$FILE"
+        fi
 
-	done < "$OUT_FILE"
+    done < "$OUT_FILE"
 
-	rm -fr "$OUT_FILE"
+    rm -fr "$OUT_FILE"
 }
 
 #Longpoll remote directory only once
@@ -1568,7 +1568,6 @@ if [[ -e $CONFIG_FILE ]]; then
     source "$CONFIG_FILE" 2>/dev/null || {
         sed -i'' 's/:/=/' "$CONFIG_FILE" && source "$CONFIG_FILE" 2>/dev/null
     }
-	echo "CONFIG_FILE=$CONFIG_FILE"
     #Checking if it's still a v1 API configuration file
     if [[ $APPKEY != "" || $APPSECRET != "" ]]; then
         echo -ne "The config file contains the old deprecated v1 oauth tokens.\n"
@@ -1628,31 +1627,32 @@ let argnum=$#-$OPTIND
 
 #CHECKING PARAMS VALUES
 case $COMMAND in
-	reset)
-		if [[ -e $CONFIG_FILE ]]; then
-			echo -ne "\n # Access token: "
-			read -r OAUTH_ACCESS_TOKEN
+    reset)
+        if [[ -e $CONFIG_FILE ]]; then
+            echo -ne "\n # Access token: "
+            read -r OAUTH_ACCESS_TOKEN
 
-			echo -ne "\n > The access token will be modified as $OAUTH_ACCESS_TOKEN. Is that ok? [y/N]: "
-			read -r answer
-			if [[ $answer != "y" ]]; then
-				remove_temp_files
-				exit 1
-			fi
+            echo -ne "\n > The access token will be modified as $OAUTH_ACCESS_TOKEN.\n"
+            echo -ne "   Is that ok? [y/N]: "
+            read -r answer
+            if [[ $answer != "y" ]]; then
+                remove_temp_files
+                exit 1
+            fi
 
-			echo "OAUTH_ACCESS_TOKEN=$OAUTH_ACCESS_TOKEN" > "$CONFIG_FILE"
-			echo "	The configuration has been saved."
+            echo "OAUTH_ACCESS_TOKEN=$OAUTH_ACCESS_TOKEN" > "$CONFIG_FILE"
+            echo "	The configuration has been saved."
 
-			remove_temp_files
-			exit 0
+            remove_temp_files
+            exit 0
 		
+        else
+            echo -ne "\n You should set the access token first!\n\n"
+            remove_temp_files
+            exit 1
+        fi
+    ;;
 
-		else
-			echo -ne "\n You should set the access token first!\n\n"
-			remove_temp_files
-			exit 1
-		fi
-	;;
     upload)
 
         if [[ $argnum -lt 2 ]]; then
@@ -1793,18 +1793,19 @@ case $COMMAND in
 
     ;;
 
-	list_file)
+    list_file)
 
-		DIR_DST="$ARG1"
+        DIR_DST="$ARG1"
 
-		#Checking DIR_DST
-		if [[ $DIR_DST == "" ]]; then
-			DIR_DST="/"
-		fi
+        #Checking DIR_DST
+        if [[ $DIR_DST == "" ]]; then
+            DIR_DST="/"
+        fi
 
-		db_list_file "/$DIR_DST"
+        db_list_file "/$DIR_DST"
 
-	;;
+    ;;
+
     monitor)
 
         DIR_DST="$ARG1"
