@@ -1282,6 +1282,59 @@ function db_list_file
     rm -fr "$OUT_FILE"
 }
 
+#List directories only in remote directory
+#$1 = Remote directory
+function db_list_directory
+{
+    local DIR_DST=$(normalize_path "$1")
+
+    print " > Listing files \"$DIR_DST\"... "
+
+    if [[ "$DIR_DST" == "/" ]]; then
+        DIR_DST=""
+    fi
+
+    OUT_FILE=$(db_list_outfile "$DIR_DST")
+    if [ -z "$OUT_FILE" ]; then
+        print "FAILED\n"
+        ERROR_STATUS=1
+        return
+    else
+        print "DONE\n"
+    fi
+
+    #Looking for the biggest file size
+    #to calculate the padding to use
+    local padding=0
+    while read -r line; do
+        local FILE=${line%:*}
+        local META=${line##*:}
+        local SIZE=${META#*;}
+        if [[ ${#SIZE} -gt $padding ]]; then
+            padding=${#SIZE}
+        fi
+    done < "$OUT_FILE"
+
+    #For each entry, printing files
+    while read -r line; do
+        local FILE=${line%:*}
+        local META=${line##*:}
+        local TYPE=${META%;*}
+        local SIZE=${META#*;}
+
+        #Removing unneeded
+        FILE=${FILE##*/}
+
+        if [[ $TYPE == "folder" ]]; then
+            FILE=$(echo -e "$FILE")
+            $PRINTF " [D] %-${padding}s %s\n" "$SIZE" "$FILE"
+        fi
+
+    done < "$OUT_FILE"
+
+    rm -fr "$OUT_FILE"
+}
+
 #Longpoll remote directory only once
 #$1 = Timeout
 #$2 = Remote directory
@@ -1803,6 +1856,19 @@ case $COMMAND in
         fi
 
         db_list_file "/$DIR_DST"
+
+    ;;
+
+    list_directory)
+
+        DIR_DST="$ARG1"
+
+        #Checking DIR_DST
+        if [[ $DIR_DST == "" ]]; then
+            DIR_DST="/"
+        fi
+
+        db_list_directory "/$DIR_DST"
 
     ;;
 
