@@ -276,6 +276,11 @@ function usage
     echo -e "\t space"
     echo -e "\t unlink"
 
+    echo -e "\nAdded by Seokhyeon"
+    echo -e "\t list_file       [REMOTE_DIR]"
+    echo -e "\t list_directory  [REMOTE_DIR]"
+    echo -e "\t reset"
+
     echo -e "\nOptional parameters:"
     echo -e "\t-f <FILENAME> Load the configuration file from a specific file"
     echo -e "\t-s            Skip already existing files when download/upload. Default: Overwrite"
