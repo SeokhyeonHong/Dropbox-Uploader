@@ -1,5 +1,6 @@
 # Open Source Software Lab Final Term Project
 본 프로젝트는 [Dropbox-Uploader](https://github.com/andreafabrizi/Dropbox-Uploader)를 기반으로 진행되었습니다.
+* 발표 영상: [Click Here](https://www.youtube.com/watch?v=GIZjR5F5Rrc)
 
 ## Dropbox-Uploader의 장점
 * **Shell Script 기반**: BASH 명령어를 사용하기 때문에 shell script 문법만 안다면 필요한 기능들을 자유롭게 추가할 수 있다.
